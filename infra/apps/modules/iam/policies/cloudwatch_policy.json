@@ -1,0 +1,13 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": ["logs:CreateLogStream", "logs:PutLogEvents"],
+      "Resource": [
+        "arn:aws:logs:${region}:${account_id}:log-group:/aws/ecs/reviewpal*",
+        "arn:aws:logs:${region}:${account_id}:log-group:/ecs/reviewpal-${env_name}-backend:*"
+      ]
+    }
+  ]
+}

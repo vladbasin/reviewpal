@@ -1,0 +1,9 @@
+{
+  "name": "reviewpal-web",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/reviewpal-web/src",
+  "projectType": "application",
+  "tags": [],
+  "// targets": "to see all targets run: nx show project reviewpal-web --web",
+  "targets": {}
+}

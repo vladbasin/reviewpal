@@ -1,0 +1,42 @@
+version: 0.2
+
+phases:
+  install:
+    on-failure: ABORT
+    runtime-versions:
+      nodejs: 18
+    commands:
+      - echo Installing dependencies...
+      - yarn install
+  pre_build:
+    on-failure: ABORT
+    commands:
+      - echo Logging in to Amazon ECR...
+      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $BACKEND_ECR_REPO_URL
+  build:
+    on-failure: ABORT
+    commands:
+      - echo Build started on `date`
+      - yarn build:prod
+      - yarn install --cwd ./dist/apps/reviewpal-be
+      - IMAGE_TAG=${CODEBUILD_RESOLVED_SOURCE_VERSION:0:7}
+      - echo Building the backend Docker image with tag $IMAGE_TAG...
+      - docker build -t $BACKEND_ECR_REPO_URL:$IMAGE_TAG .
+  post_build:
+    on-failure: ABORT
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing the Docker image...
+      - docker push $BACKEND_ECR_REPO_URL:$IMAGE_TAG
+      - echo Writing image definitions file...
+      - printf '[{"name":"backend-container","imageUri":"%s"}]' "$BACKEND_ECR_REPO_URL:$IMAGE_TAG" > imagedefinitions.json
+
+artifacts:
+  secondary-artifacts:
+    BackendBuildArtifact:
+      files:
+        - imagedefinitions.json
+    WebBuildArtifact:
+      files:
+        - '**/*'
+      base-directory: ./dist/apps/reviewpal-web

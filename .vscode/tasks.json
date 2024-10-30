@@ -1,0 +1,40 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Watch all",
+      "dependsOn": ["Watch apps/reviewpal-be", "Watch apps/reviewpal-web", "Watch common"],
+      "group": "build",
+      "runOptions": {
+        "runOn": "folderOpen"
+      }
+    },
+    {
+      "label": "Watch apps/reviewpal-be",
+      "type": "typescript",
+      "tsconfig": "apps/reviewpal-be/tsconfig.json",
+      "option": "watch",
+      "problemMatcher": ["$tsc-watch"],
+      "group": "build",
+      "isBackground": true
+    },
+    {
+      "label": "Watch apps/reviewpal-web",
+      "type": "typescript",
+      "tsconfig": "apps/reviewpal-web/tsconfig.json",
+      "option": "watch",
+      "problemMatcher": ["$tsc-watch"],
+      "group": "build",
+      "isBackground": true
+    },
+    {
+      "label": "Watch common",
+      "type": "typescript",
+      "tsconfig": "common/tsconfig.json",
+      "option": "watch",
+      "problemMatcher": ["$tsc-watch"],
+      "group": "build",
+      "isBackground": true
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+env_name                                    = "dev"
+region                                      = "us-east-2"
+db_instance_class                           = "db.t3.micro"
+vpc_az_count                                = 2
+desired_service_count                       = 1
+log_level                                   = "warn"
+app_admin_initial_email                     = "admin@reviewpal.io"
+app_admin_initial_password                  = "admin"
+app_admin_initial_name                      = "Admin"
+app_access_token_expiration_seconds         = "3600"
+app_refresh_token_expiration_seconds        = "259200"
+app_reset_password_token_expiration_seconds = "600"
+app_use_secure_cookies                      = true

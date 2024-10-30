@@ -1,0 +1,10 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": ["kms:Sign", "kms:GetPublicKey", "kms:DescribeKey"],
+      "Resource": "${kms_access_token_key_arn}"
+    }
+  ]
+}

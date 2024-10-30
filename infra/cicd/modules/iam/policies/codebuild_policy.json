@@ -1,0 +1,42 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": ["s3:GetObject", "s3:PutObject"],
+      "Resource": ["arn:aws:s3:::${pipeline_bucket_name}/*"]
+    },
+    {
+      "Effect": "Allow",
+      "Action": ["ecr:GetAuthorizationToken"],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:CompleteLayerUpload",
+        "ecr:GetDownloadUrlForLayer",
+        "ecr:InitiateLayerUpload",
+        "ecr:PutImage",
+        "ecr:UploadLayerPart"
+      ],
+      "Resource": "arn:aws:ecr:${region}:${account_id}:repository/*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": ["logs:CreateLogStream", "logs:PutLogEvents", "logs:CreateLogGroup"],
+      "Resource": "arn:aws:logs:${region}:${account_id}:log-group:/aws/codebuild/reviewpal-${env_name}-*:*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": ["cloudfront:CreateInvalidation"],
+      "Resource": "arn:aws:cloudfront::${account_id}:distribution/${cloudfront_web_distribution_id}"
+    },
+    {
+      "Effect": "Allow",
+      "Action": ["ssm:PutParameter"],
+      "Resource": "arn:aws:ssm:${region}:${account_id}:parameter/reviewpal/${env_name}/*"
+    }
+  ]
+}

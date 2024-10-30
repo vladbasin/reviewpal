@@ -1,0 +1,58 @@
+{
+  "name": "reviewpal-be",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/reviewpal-be/src",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/esbuild:esbuild",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "platform": "node",
+        "outputPath": "dist/apps/reviewpal-be",
+        "format": ["cjs"],
+        "bundle": false,
+        "main": "apps/reviewpal-be/src/main.ts",
+        "tsConfig": "apps/reviewpal-be/tsconfig.app.json",
+        "assets": ["apps/reviewpal-be/src/assets"],
+        "generatePackageJson": true,
+        "esbuildOptions": {
+          "sourcemap": true,
+          "outExtension": {
+            ".js": ".js"
+          }
+        }
+      },
+      "configurations": {
+        "development": {},
+        "production": {
+          "esbuildOptions": {
+            "sourcemap": false,
+            "outExtension": {
+              ".js": ".js"
+            }
+          }
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "dependsOn": ["build"],
+      "options": {
+        "buildTarget": "reviewpal-be:build",
+        "runBuildTargetDependencies": false
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "reviewpal-be:build:development"
+        },
+        "production": {
+          "buildTarget": "reviewpal-be:build:production"
+        }
+      }
+    }
+  }
+}

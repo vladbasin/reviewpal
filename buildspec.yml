@@ -6,8 +6,8 @@ phases:
     runtime-versions:
       nodejs: 18
     commands:
-      - echo Installing dependencies...
-      - yarn install
+      - echo Installing build dependencies...
+      - npm ci
   pre_build:
     on-failure: ABORT
     commands:
@@ -17,8 +17,8 @@ phases:
     on-failure: ABORT
     commands:
       - echo Build started on `date`
-      - yarn build:prod
-      - yarn install --cwd ./dist/apps/reviewpal-be
+      - npm run build:prod
+      - npm ci --prefix ./dist/apps/reviewpal-be --only=production
       - IMAGE_TAG=${CODEBUILD_RESOLVED_SOURCE_VERSION:0:7}
       - echo Building the backend Docker image with tag $IMAGE_TAG...
       - docker build -t $BACKEND_ECR_REPO_URL:$IMAGE_TAG .

@@ -7,8 +7,8 @@ import type { Maybe } from '@vladbasin/ts-types';
 import { inject, injectable } from 'inversify';
 import { SecretsProviderSid } from '@reviewpal/be/_sids';
 
-const IvLength = 16;
-const Algorithm = 'aes-256-cbc';
+const IvLength = 12;
+const Algorithm = 'aes-256-gcm';
 const EncryptionBufferEncoding = 'hex';
 const IvEncryptedSeparator = ':';
 const StrippedValue = '******';
@@ -34,9 +34,11 @@ export class Crypter implements ICrypter {
     const iv = randomBytes(IvLength);
     const cipher = createCipheriv(Algorithm, this._key, iv);
     const encrypted = Buffer.concat([cipher.update(plainText), cipher.final()]);
+    const authTag = cipher.getAuthTag();
+
     return `${iv.toString(EncryptionBufferEncoding)}${IvEncryptedSeparator}${encrypted.toString(
       EncryptionBufferEncoding
-    )}`;
+    )}${IvEncryptedSeparator}${authTag.toString(EncryptionBufferEncoding)}`;
   }
 
   public decrypt(encryptedText: string): string {
@@ -44,9 +46,11 @@ export class Crypter implements ICrypter {
       throw new Error('Crypter key is not initialized');
     }
 
-    const [ivHex, encryptedData] = encryptedText.split(IvEncryptedSeparator);
+    const [ivHex, encryptedData, authTagHex] = encryptedText.split(IvEncryptedSeparator);
     const iv = Buffer.from(ivHex, EncryptionBufferEncoding);
+    const authTag = Buffer.from(authTagHex, EncryptionBufferEncoding);
     const decipher = createDecipheriv(Algorithm, this._key, iv);
+    decipher.setAuthTag(authTag);
     const decrypted = Buffer.concat([
       decipher.update(Buffer.from(encryptedData, EncryptionBufferEncoding)),
       decipher.final(),
@@ -102,7 +106,7 @@ export class Crypter implements ICrypter {
 
       // Reference field must be always encrypted, so we encrypt target field also
       if (fieldValue !== StrippedValue) {
-        targetFieldValue = this.encrypt(targetFieldValue);
+        targetFieldValue = this.encrypt(fieldValue);
       }
 
       target = setIn(target, field, targetFieldValue);

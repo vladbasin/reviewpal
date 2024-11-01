@@ -45,3 +45,4 @@ apps/reviewpal-be/local/.secret
 .terraform
 tfplan
 .env
+.scannerwork

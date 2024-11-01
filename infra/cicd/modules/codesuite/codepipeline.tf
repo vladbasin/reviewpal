@@ -6,6 +6,15 @@ resource "aws_s3_bucket" "pipeline_bucket" {
   }
 }
 
+resource "aws_s3_bucket_public_access_block" "pipeline_bucket" {
+  bucket = aws_s3_bucket.pipeline_bucket.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
 resource "aws_codepipeline" "main_pipeline" {
   name     = "reviewpal-${var.env_name}-pipeline"
   role_arn = var.codepipeline_service_role_arn

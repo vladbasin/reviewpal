@@ -18,12 +18,47 @@
 
 ## Deployment
 
-### 1. Initial Setup
+### Run Locally
+
+1. Create `.env` file from `example.env` inside `/apps/reviewpal-be` and `/apps/reviewpal-web` folders.
+2. Fill values for `.env` file based on instructions inside.
+
+Below scripts can be used to generate the data required for `.env` to run Review Pal locally.
+
+**Generate Access Token Certificates**
+```bash
+# Generate private key
+openssl genpkey -algorithm RSA -out private_key.pem -pkeyopt rsa_keygen_bits:2048
+
+# Generate public key
+openssl rsa -pubout -in private_key.pem -out public_key.pem
+
+# Convert to base64
+cat private_key.pem | base64 | tr '+/' '-_' | tr -d '=' | tr -d '\n'
+cat public_key.pem | base64 | tr '+/' '-_' | tr -d '=' | tr -d '\n'
+```
+
+**Generate Encryption Key for secure storage of sensitive data in DB**
+```bash
+openssl rand -hex 32
+```
+
+4. Run the following commands
+
+```bash
+npm install
+npm run local:be # Starts backend
+npm run local:web # Starts frontend
+```
+
+### Deploy to AWS
+
+#### Initial configuration
 
 1. Create an S3 bucket for Terraform state:
   
 ```bash
-aws s3 mb s3://reviewpal-tf-state
+aws s3 mb s3://reviewpal-tf-state # example name, use your own
 ```
 
 2. Configure required SSM parameters:
@@ -35,13 +70,11 @@ aws ssm put-parameter --name "/reviewpal/[ENV_NAME]/SOURCE_REPOSITORY_ID" --valu
 aws ssm put-parameter --name "/reviewpal/[ENV_NAME]/BACKEND_CONTAINER_IMAGE" --value "" --type "String"
 ```
 
-### 2. Deploy Infrastructure
-
 #### Applications Infrastructure
 ```bash
 cd infra/apps
 
-# Initialize Terraform
+# Initialize Terraform (replace bucket name with created by you on previous steps)
 terraform init \
   -backend-config="bucket=reviewpal-tf-state" \
   -backend-config="key=dev/apps/terraform-apps.tfstate" \
@@ -71,37 +104,14 @@ terraform apply tfplan
 
 ### 3. Ongoing Deployments
 
-After initial setup, use AWS PipeLine for subsequent deployments.
+After initial setup, use AWS Pipeline for subsequent deployments.
 
 ### 4. Cleanup
 
-To remove all created infrastructure (needs to be executed from both `/apps` and `/cicd` folders):
+To remove all created infrastructure (needs to be executed from both `/infra/apps` and `/infra/cicd` folders):
 
 ```bash
 terraform destroy -var-file=./environments/dev.tfvars
-```
-
-## Local Development
-
-### Security Setup
-
-#### 1. Generate Access Token Certificates
-```bash
-# Generate private key
-openssl genpkey -algorithm RSA -out private_key.pem -pkeyopt rsa_keygen_bits:2048
-
-# Generate public key
-openssl rsa -pubout -in private_key.pem -out public_key.pem
-
-# Convert to base64 (for configuration)
-cat private_key.pem | base64 | tr '+/' '-_' | tr -d '=' | tr -d '\n'
-cat public_key.pem | base64 | tr '+/' '-_' | tr -d '=' | tr -d '\n'
-```
-
-#### 2. Generate Encryption Key
-For secure storage of sensitive data in DB:
-```bash
-openssl rand -hex 32
 ```
 
 ## Contributing
